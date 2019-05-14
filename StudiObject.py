@@ -5,7 +5,7 @@ class StudiObject:
         self.matr = matr
 
     def __repr__(self):
-        return "Student " + self.name + " mit der Matrikelnummer " + str(self.matr)
+        return "Student({}, {})".format(self.matr, self.name)
 
     def get_name(self):
         return self.name
