@@ -5,12 +5,6 @@ from StudiObject import StudiObject
 def empty():
     raise NotImplementedError("Ey du Wurst! Hier is nüx.")
 
-
-delete_all_data = empty
-print_ll_by_name = empty
-print_ll_by_matr = empty
-search_by_name = empty
-search_by_matr = empty
 add_new_studiobject = empty
 delete_by_name = empty
 delete_by_matr = empty
@@ -19,19 +13,46 @@ change_matr = empty
 
 
 class TUI:
-    def __init__(self):
+    def __search(self, lst: LinkedList, what, key):
+        res = lst.search(what, key=key)
+        return res
+
+    def _search_by(self, lst, key, cast_to=None):
+        name = input(">>> ")
+        if cast_to is None:
+            res = self.__search(self.ll_by_name, what=name, key=key)
+        else:
+            res = self.__search(self.ll_by_name, what=cast_to(name), key=key)
+        self._print(res)
+
+    def __init__(self, filepath=None):
+        if filepath is None:
+            filepath = "studidaten.txt"
+
+        self.filepath = filepath
         self.options = {
-            "L":  ("Alle daten löschen", self._del_all),
-            "Z":  ("Gib den Array aus", self._print_array),
-            "ZN": ("Liste nach Namen anzeigen", self._print_by_name),
-            "ZM": ("Liste nach Matrikelnummer anzeigen", self._print_by_matr),
-            "SN": ("Studi mit bestimmtenm Namen suchen", search_by_name),
-            "SM": ("Studi mit bestimmter Matrikelnummer suchen", search_by_matr),
-            "N":  ("Neuen Studi einfügen", add_new_studiobject),
-            "LN": ("Studi nach Namen löschen", delete_by_name),
-            "LM": ("Studi nache Matrikelnummer löschen", delete_by_matr),
-            "MN": ("Studinamen ändern", change_name),
-            "MM": ("Matrikelnummer ändern", change_matr),
+            "L":  ("Alle daten löschen",
+                    self._del_all),
+            "Z":  ("Gib den Array aus",
+                    lambda: self._print(self.unsorted_array)),
+            "ZN": ("Liste nach Namen anzeigen",
+                    lambda: self._print(self.ll_by_name)),
+            "ZM": ("Liste nach Matrikelnummer anzeigen",
+                    lambda: self._print(self.ll_by_matr)),
+            "SN": ("Studi mit bestimmtenm Namen suchen",
+                    lambda: self._search_by(self.ll_by_name, lambda studi: studi.get_name())),
+            "SM": ("Studi mit bestimmter Matrikelnummer suchen",
+                    lambda: self._search_by(self.ll_by_matr, lambda studi: studi.get_matr(), int) ),
+            "N":  ("Neuen Studi einfügen",
+                    add_new_studiobject),
+            "LN": ("Studi nach Namen löschen",
+                    delete_by_name),
+            "LM": ("Studi nache Matrikelnummer löschen",
+                    delete_by_matr),
+            "MN": ("Studinamen ändern",
+                    change_name),
+            "MM": ("Matrikelnummer ändern",
+                    change_matr),
             "S":  ("Daten speichern", self._save),
             "E":  ("Programmende", exit)
         }
@@ -45,36 +66,28 @@ class TUI:
         print()  # space menu from former output
         for key, menu_item in self.options.items():
             print(" # {} - {}".format(key, menu_item[0]))
-        inp = input("Please choose one of the options above: ").upper()
-        self.options.get(inp, self._invalid_input)[1]()
+        inp = input("Please choose one of the options above: \n>>> ").upper()
+        self.options.get(inp, ("invalid", self._invalid_input))[1]()
 
     def _invalid_input(self):
         print("invalid input")
 
-    def _print_by_matr(self):
-        print("print_by_matr: ")
-        for studi in reversed(list(self.ll_by_matr)):
-            print(" - {}".format(studi.get_data()))
+    def _print(self, what):
+        l = list(reversed(list(what)))
+        if len(l) == 0:
+            return print("nothing here")
+        for studi in l:
+            print(" - {}".format(studi))
 
-    def _print_by_name(self):
-        print("print_by_name: ")
-
-        for studi in reversed(list(self.ll_by_name)):
-            print(" - {}".format(studi.get_data()))
-
-    def _save(self, filepath=None):
-        if filepath is None:
-            filepath = "studidaten.txt"
-        with open(filepath, "w", encoding="UTF-8") as file:
+    def _save(self):
+        with open(self.filepath, "w", encoding="UTF-8") as file:
             for obj in self.unsorted_array:
                 name, matr = obj.get_name(), obj.get_matr()
                 file.write(str(name) + ", " + str(matr) + "\n")
 
-    def _load(self, filepath=None):
-        if filepath is None:
-            filepath = "studidaten.txt"
+    def _load(self):
         try:
-            with open(filepath, "r", encoding="UTF-8") as file:
+            with open(self.filepath, "r", encoding="UTF-8") as file:
                 for line in file:
                     name, matr = line.strip("\n").split(",")
                     new_studi = StudiObject(name, int(matr))
@@ -90,10 +103,6 @@ class TUI:
         self.ll_by_name = LinkedList()
         self.ll_by_matr = LinkedList()
 
-    def _print_array(self):
-        print("Studenten:")
-        for studi in self.unsorted_array:
-            print(" - {}".format(studi))
 
 
 if __name__ == "__main__":

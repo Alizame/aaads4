@@ -57,10 +57,11 @@ class LinkedList:
         next_node.set_next(new_node)
 
     def search(self, my_key_data, key=default_sorting_eval):
+        ret = []
         for node in self:
             if my_key_data == key(node.get_data()):
-                return node
-        raise AttributeError
+                ret.append(node)
+        return ret
 
     def delete(self, my_key_data, key=default_sorting_eval):  # deletes all found, returns list of deleted nodes
         ret = []  # list of deleted elements

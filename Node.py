@@ -5,7 +5,7 @@ class Node:
         self.next_node = next_node
 
     def __repr__(self):
-        return "\\{}/".format(self.data)
+        return str(self.data)
 
     def get_next(self):
         return self.next_node
