@@ -5,24 +5,19 @@ from StudiObject import StudiObject
 def empty():
     raise NotImplementedError("Ey du Wurst! Hier is nüx.")
 
-delete_by_name = empty
-delete_by_matr = empty
 change_name = empty
 change_matr = empty
 
 _sort_name = lambda studi: studi.get_name()
 _sort_matr = lambda studi: studi.get_matr()
-
+no = lambda x: x
 
 class TUI:
 
-    def _search_by(self, lst, key, cast_to=None):
-        name = input(">>> ")
-        if cast_to is None:
-            res = lst.search(name, key=key)
-        else:
-            res = lst.search(cast_to(name), key=key)
-        return res
+    @staticmethod
+    def _search(lst, key, cast_to=no):
+        what = cast_to(input(">>> "))
+        return lst.search(what, key=key)
 
     def _add_new_studi(self):
         name = input("name: ")
@@ -34,9 +29,12 @@ class TUI:
         self.ll_by_name.attach_sorted(studi, key=_sort_name)
         self.ll_by_matr.attach_sorted(studi, key=_sort_matr)
 
-    def _del(self, node):  # deletes all occurences!!!!!!!!!!?
-        self.unsorted_array.remove()
+    def _del(self, lst, key, cast_to=no):  # deletes all occurences!!!!!!!!!!?
+        what = cast_to(input(">>> "))
 
+        self.unsorted_array = [studi for studi in self.unsorted_array if not what == key(studi)]
+        self.ll_by_matr.delete(what, key=key)
+        self.ll_by_name.delete(what, key=key)
 
     def __init__(self, filepath=None):
         if filepath is None:
@@ -46,22 +44,22 @@ class TUI:
         self.options = {
             "L":  ("Alle daten löschen",
                    self._del_all),
-            "Z":  ("Gib den Array aus",
+            "Z":  ("Gib das Array aus",
                    lambda: self._print(self.unsorted_array)),
             "ZN": ("Liste nach Namen anzeigen",
                    lambda: self._print(self.ll_by_name)),
             "ZM": ("Liste nach Matrikelnummer anzeigen",
                    lambda: self._print(self.ll_by_matr)),
             "SN": ("Studi mit bestimmtenm Namen suchen",
-                   lambda: self._print(self._search_by(self.ll_by_name, _sort_name))),
+                   lambda: self._print(self._search(self.ll_by_name, _sort_name))),
             "SM": ("Studi mit bestimmter Matrikelnummer suchen",
-                   lambda: self._print(self._search_by(self.ll_by_matr, _sort_matr, int))),
+                   lambda: self._print(self._search(self.ll_by_matr, _sort_matr, int))),
             "N":  ("Neuen Studi einfügen",
                    self._add_new_studi),
             "LN": ("Studi nach Namen löschen",
-                   delete_by_name),
+                   lambda: self._del(self.ll_by_name, _sort_name)),
             "LM": ("Studi nache Matrikelnummer löschen",
-                   delete_by_matr),
+                   lambda: self._del(self.ll_by_matr, _sort_matr, int)),
             "MN": ("Studinamen ändern",
                    change_name),
             "MM": ("Matrikelnummer ändern",
@@ -80,18 +78,20 @@ class TUI:
         for key, menu_item in self.options.items():
             print(" # {} - {}".format(key, menu_item[0]))
         inp = input("Please choose one of the options above: \n>>> ").upper()
-        self.options.get(inp, ("invalid", self._invalid_input))[1]()
+        sel = self.options.get(inp, ("invalid", self._invalid_input))
+        print("Selected '{}':".format(sel[0]))
+        sel[1]()
 
     def _invalid_input(self):
         print("invalid input")
 
     @staticmethod
     def _print(what):
-        l = list(reversed(list(what)))
-        if len(l) == 0:
+        studilist = (list(what))
+        if len(studilist) == 0:
             return print("nothing here")
-        for studi in l:
-            print(" - {}".format(studi))
+        for number, studi in enumerate(studilist):
+            print(" - #{}\t {}".format(number+1, studi))
 
     def _save(self):
         with open(self.filepath, "w", encoding="UTF-8") as file:
