@@ -63,21 +63,10 @@ class LinkedList:
                 ret.append(node)
         return ret
 
-    def delete(self, my_key_data, key=default_sorting_eval):  # deletes all found, returns list of deleted nodes
-        ret = []  # list of deleted elements
-
-        # special case: head should be deleted (and the following new heads...):
-        while my_key_data == key(self.head.get_data()):
-            ret.append(self.head)
-            self.head = self.head.get_next()
-
-        # normal case:
-        next_node = self.head  # self.head is now a "not to be deleted node"
-        while next_node is not None and next_node.get_next() is not None:  # 1. part is because of deleted nodes
-            if my_key_data == key(next_node.get_next().get_data()):  # find matching node
-                ret.append(next_node.get_next())
-                next_node.set_next(next_node.get_next().get_next())
-            next_node = next_node.get_next()
+    def delete(self, what, key=default_sorting_eval):  # deletes all found, returns list of deleted nodes
+        ret = self.search(what, key)
+        for node in ret:
+            self.delete_node(node)
         return ret
 
     def delete_node(self, del_node):
