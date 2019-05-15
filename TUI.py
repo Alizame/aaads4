@@ -117,10 +117,13 @@ class TUI:
             print(" - #{}\t {}".format(number+1, obj))
 
     def _save(self):
-        with open(self.filepath, "w", encoding="UTF-8") as file:
-            for obj in self.unsorted_array:
-                name, matr = obj.get_name(), obj.get_matr()
-                file.write(str(name) + ", " + str(matr) + "\n")
+        try:
+            with open(self.filepath, "w", encoding="UTF-8") as file:
+                for obj in self.unsorted_array:
+                    name, matr = obj.get_name(), obj.get_matr()
+                    file.write(str(name) + ", " + str(matr) + "\n")
+        except (IOError, ValueError) as e:
+            print("Fehler beim schreiben der Datei, möglicherweise Schreibschutz." + str(e))
 
     def _load(self):
         try:
@@ -129,9 +132,8 @@ class TUI:
                     name, matr = line.strip("\n").split(",")
                     new_obj = StudiObject(name, int(matr))
                     self._add(new_obj)
-        except Exception as e:
-            print("Error while reading file")
-            print(e)
+        except (IOError, ValueError) as e:
+            print("Fehler beim lesen der Datei." + str(e))
 
     def _del_all(self):
         self.unsorted_array = []
