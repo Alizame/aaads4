@@ -42,7 +42,7 @@ class LinkedList:
             return self.attach(data)
 
         # special case: new ist bigger than head
-        if key(data) >= key(self.head.get_data()):
+        if key(data) <= key(self.head.get_data()):
             return self.attach(data)
 
         # normal case (also handles special case where it new_node only fits to the end):
@@ -50,7 +50,7 @@ class LinkedList:
         #   search for corresponding gap in LL
         while (next_node.get_next() is not None) \
                 and \
-                not (key(next_node.get_data()) >= key(new_node.get_data()) >= key(next_node.get_next().get_data())):
+                not (key(next_node.get_data()) <= key(new_node.get_data()) <= key(next_node.get_next().get_data())):
             next_node = next_node.get_next()
 
         new_node.set_next(next_node.get_next())  # print("found next_node is %s" % next_node)
@@ -81,7 +81,17 @@ class LinkedList:
         return ret
 
     def delete_node(self, del_node):
-        raise NotImplementedError
+        # special case: head should be deleted:
+        if self.head is del_node:
+            self.head = self.head.get_next()
+            return
+
+        # normal case:
+        next_node = self.head
+        while next_node is not None and next_node.get_next() is not None:
+            if next_node.get_next() is del_node:
+                return next_node.set_next(next_node.get_next().get_next())
+            next_node = next_node.get_next()
 
 
 if __name__ == "__main__":
@@ -110,9 +120,12 @@ if __name__ == "__main__":
     print("###################")
 
     print("Deleting: ")
-    print("deleted: %s" % ll.delete(8))
-    print("deleted: %s" % ll.delete(3.5))
-    print("deleted: %s" % ll.delete(0))
+    ls = list(ll)
+    ll.delete_node(ls[0])
+    ll.delete_node(ls[4])
+    ll.delete_node(ls[-1])
+    print("deleted!")
+
 
     for itm in ll:
         print(itm)
