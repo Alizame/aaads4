@@ -3,18 +3,25 @@ from StudiObject import StudiObject
 
 _sort_name = lambda studi: studi.get_name()
 _sort_matr = lambda studi: studi.get_matr()
-no = lambda x: x
+no_cast = lambda x: x
 
 class TUI:
 
-    @staticmethod
-    def _search(lst, key, cast_to=no):
-        what = cast_to(input(">>> "))
+    def _input(self, text, cast_to=no_cast):
+        try:
+            inpt = cast_to(input(text))
+        except ValueError:
+            print("bad input, try again")
+            return self._input(text, cast_to)
+        return inpt
+
+    def _search(self, lst, key, cast_to=no_cast):
+        what = self._input(">>> ", cast_to)
         return lst.search(what, key=key)
 
     def _add_new_studi(self):
-        name = input("name: ")
-        matr = int(input("matr: "))
+        name = self._input("name: ")
+        matr = self._input("matr: ", int)
         self._add(StudiObject(name, matr))
 
     def _add(self, studi):
@@ -22,8 +29,8 @@ class TUI:
         self.ll_by_name.attach_sorted(studi, key=_sort_name)
         self.ll_by_matr.attach_sorted(studi, key=_sort_matr)
 
-    def _del_search(self, key, cast_to=no):  # deletes all occurences!!!!!!!!!!?
-        what = cast_to(input(">>> "))
+    def _del_search(self, key, cast_to=no_cast):  # deletes all occurences!!!!!!!!!!?
+        what = self._input(">>> ", cast_to)
 
         self.unsorted_array = [studi for studi in self.unsorted_array if not what == key(studi)]
         self.ll_by_matr.delete(what, key=key)
@@ -37,8 +44,8 @@ class TUI:
     def _modify_name(self):
         print("Wähle Nummer:")
         self._print(self.ll_by_name)
-        studi_node = list(self.ll_by_name)[int(input(">>> "))-1]
-        new_name = input("Ändere {}: neuer Name: \n>>> ".format(studi_node))
+        studi_node = list(self.ll_by_name)[self._input(">>> ", int)-1]
+        new_name = self._input("Ändere {}: neuer Name: \n>>> ".format(studi_node))
         self.__del_node(studi_node)  # delete from lists
         studi_node.get_data().set_name(new_name)  # change student
         self._add(studi_node.get_data())  # reinsert student (to maintain sorted lists)
@@ -46,8 +53,8 @@ class TUI:
     def _modify_matr(self):
         print("Wähle Nummer:")
         self._print(self.ll_by_matr)
-        studi_node = list(self.ll_by_matr)[int(input(">>> "))-1]
-        new_age = int(input("Ändere {}: neue matr: \n>>> ".format(studi_node)))
+        studi_node = list(self.ll_by_matr)[self._input(">>> ", int)-1]
+        new_age = self._input("Ändere {}: neue matr: \n>>> ".format(studi_node), int)
         self.__del_node(studi_node)  # delete from lists
         studi_node.get_data().set_matr(new_age)  # change student
         self._add(studi_node.get_data())  # reinsert student (to maintain sorted lists)
@@ -93,21 +100,21 @@ class TUI:
         print()  # space menu from former output
         for key, menu_item in self.options.items():
             print(" # {} - {}".format(key, menu_item[0]))
-        inp = input("Please choose one of the options above: \n>>> ").upper()
-        sel = self.options.get(inp, ("invalid", self._invalid_input))
+        inp = self._input("Wähle weise: \n>>> ").upper()
+        sel = self.options.get(inp, ("ungültige Eingabe", self._invalid_input))
         print("'{}' ausgewählt:".format(sel[0]))
         sel[1]()
 
     def _invalid_input(self):
-        print("invalid input")
+        print("ungültige Eingabe")
 
     @staticmethod
     def _print(what):
-        studilist = (list(what))
-        if len(studilist) == 0:
+        objlist = list(what)  # cast to list [needed if obj is an iterator/generator]
+        if len(objlist) == 0:
             return print("nothing here")
-        for number, studi in enumerate(studilist):
-            print(" - #{}\t {}".format(number+1, studi))
+        for number, obj in enumerate(objlist):
+            print(" - #{}\t {}".format(number+1, obj))
 
     def _save(self):
         with open(self.filepath, "w", encoding="UTF-8") as file:
@@ -120,8 +127,8 @@ class TUI:
             with open(self.filepath, "r", encoding="UTF-8") as file:
                 for line in file:
                     name, matr = line.strip("\n").split(",")
-                    new_studi = StudiObject(name, int(matr))
-                    self._add(new_studi)
+                    new_obj = StudiObject(name, int(matr))
+                    self._add(new_obj)
         except Exception as e:
             print("Error while reading file")
             print(e)
@@ -130,7 +137,6 @@ class TUI:
         self.unsorted_array = []
         self.ll_by_name = LinkedList()
         self.ll_by_matr = LinkedList()
-
 
 
 if __name__ == "__main__":
