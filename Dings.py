@@ -13,18 +13,16 @@ change_matr = empty
 _sort_name = lambda studi: studi.get_name()
 _sort_matr = lambda studi: studi.get_matr()
 
+
 class TUI:
-    def __search(self, lst: LinkedList, what, key):
-        res = lst.search(what, key=key)
-        return res
 
     def _search_by(self, lst, key, cast_to=None):
         name = input(">>> ")
         if cast_to is None:
-            res = self.__search(self.ll_by_name, what=name, key=key)
+            res = lst.search(name, key=key)
         else:
-            res = self.__search(self.ll_by_name, what=cast_to(name), key=key)
-        self._print(res)
+            res = lst.search(cast_to(name), key=key)
+        return res
 
     def _add_new_studi(self):
         name = input("name: ")
@@ -35,6 +33,10 @@ class TUI:
         self.unsorted_array.append(studi)
         self.ll_by_name.attach_sorted(studi, key=_sort_name)
         self.ll_by_matr.attach_sorted(studi, key=_sort_matr)
+
+    def _del(self, node):  # deletes all occurences!!!!!!!!!!?
+        self.unsorted_array.remove()
+
 
     def __init__(self, filepath=None):
         if filepath is None:
@@ -51,9 +53,9 @@ class TUI:
             "ZM": ("Liste nach Matrikelnummer anzeigen",
                    lambda: self._print(self.ll_by_matr)),
             "SN": ("Studi mit bestimmtenm Namen suchen",
-                   lambda: self._search_by(self.ll_by_name, _sort_name)),
+                   lambda: self._print(self._search_by(self.ll_by_name, _sort_name))),
             "SM": ("Studi mit bestimmter Matrikelnummer suchen",
-                   lambda: self._search_by(self.ll_by_matr, _sort_matr, int)),
+                   lambda: self._print(self._search_by(self.ll_by_matr, _sort_matr, int))),
             "N":  ("Neuen Studi einfügen",
                    self._add_new_studi),
             "LN": ("Studi nach Namen löschen",

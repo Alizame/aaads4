@@ -80,6 +80,9 @@ class LinkedList:
             next_node = next_node.get_next()
         return ret
 
+    def delete_node(self, del_node):
+        raise NotImplementedError
+
 
 if __name__ == "__main__":
     ll = LinkedList()
