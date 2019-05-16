@@ -9,7 +9,10 @@ class TUI:
 
     def _input(self, text, cast_to=no_cast):
         try:
-            inpt = cast_to(input(text))
+            inpt_str = input(text)
+            if inpt_str == "":
+                raise ValueError()
+            inpt = cast_to(inpt_str)
         except ValueError:
             print("bad input, try again")
             return self._input(text, cast_to)
@@ -30,6 +33,7 @@ class TUI:
         self.ll_by_matr.attach_sorted(studi, key=_sort_matr)
 
     def _del_search(self, key, cast_to=no_cast):  # deletes all occurences!!!!!!!!!!?
+        # print("Achtung: alle gefundenen Studis werden gelöscht!")
         what = self._input(">>> ", cast_to)
 
         self.unsorted_array = [studi for studi in self.unsorted_array if not what == key(studi)]
@@ -114,7 +118,7 @@ class TUI:
         if len(objlist) == 0:
             return print("nothing here")
         for number, obj in enumerate(objlist):
-            print(" - #{}\t {}".format(number+1, obj))
+            print(" - #{}\t {}".format(number + 1, obj))
 
     def _save(self):
         try:
@@ -146,4 +150,3 @@ if __name__ == "__main__":
 
     while True:
         tui.menu()
-
