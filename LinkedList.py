@@ -21,8 +21,9 @@ def default_search_eval(data):
 
 class LinkedList:
 
-    def __init__(self):
+    def __init__(self, key=default_sorting_eval):
         self.head = None
+        self.key = key
 
     def __iter__(self):
         tmp = self.head
@@ -36,13 +37,13 @@ class LinkedList:
     def attach(self, data):
         self.head = Node(data, self.head)
 
-    def attach_sorted(self, data, key=default_sorting_eval):
+    def insert(self, data):
         # special case: empty list, just insert new node
         if self.head is None:
             return self.attach(data)
 
         # special case: new ist bigger than head
-        if key(data) <= key(self.head.get_data()):
+        if self.key(data) <= self.key(self.head.get_data()):
             return self.attach(data)
 
         # normal case (also handles special case where it new_node only fits to the end):
@@ -50,20 +51,24 @@ class LinkedList:
         #   search for corresponding gap in LL
         while (next_node.get_next() is not None) \
                 and \
-                not (key(next_node.get_data()) <= key(new_node.get_data()) <= key(next_node.get_next().get_data())):
+                not (self.key(next_node.get_data()) <= self.key(new_node.get_data()) <= self.key(next_node.get_next().get_data())):
             next_node = next_node.get_next()
 
         new_node.set_next(next_node.get_next())  # print("found next_node is %s" % next_node)
         next_node.set_next(new_node)
 
-    def search(self, my_key_data, key=default_sorting_eval):
+    def search(self, my_key_data, key=None):
+        if key is None:
+            key = self.key
         ret = []
         for node in self:
             if my_key_data == key(node.get_data()):
                 ret.append(node)
         return ret
 
-    def delete(self, what, key=default_sorting_eval):  # deletes all found, returns list of deleted nodes
+    def delete(self, what, key=None):  # deletes all found, returns list of deleted nodes
+        if key is None:
+            key = self.key
         ret = self.search(what, key)
         for node in ret:
             self.delete_node(node)
@@ -87,12 +92,12 @@ if __name__ == "__main__":
     ll = LinkedList()
 
     for i in [1, 2, 3, 4, 5, 6, 7]:
-        ll.attach_sorted(i)
+        ll.insert(i)
 
     print("ok")
-    ll.attach_sorted(8)
-    ll.attach_sorted(3.5)
-    ll.attach_sorted(0)
+    ll.insert(8)
+    ll.insert(3.5)
+    ll.insert(0)
     print("ok2")
 
     for itm in ll:
@@ -114,7 +119,6 @@ if __name__ == "__main__":
     ll.delete_node(ls[4])
     ll.delete_node(ls[-1])
     print("deleted!")
-
 
     for itm in ll:
         print(itm)

@@ -4,6 +4,7 @@ from StudiObject import StudiObject
 _sort_name = lambda studi: studi.get_name()
 _sort_matr = lambda studi: studi.get_matr()
 no_cast = lambda x: x
+_invalid_input = lambda: print("ungültige Eingabe")
 
 class TUI:
 
@@ -20,7 +21,7 @@ class TUI:
 
     def _search(self, lst, key, cast_to=no_cast):
         what = self._input(">>> ", cast_to)
-        return lst.search(what, key=key)
+        return lst.search(what, what=key)
 
     def _add_new_studi(self):
         name = self._input("name: ")
@@ -29,13 +30,12 @@ class TUI:
 
     def _add(self, studi):
         self.unsorted_array.append(studi)
-        self.ll_by_name.attach_sorted(studi, key=_sort_name)
-        self.ll_by_matr.attach_sorted(studi, key=_sort_matr)
+        self.ll_by_name.insert(studi)
+        self.ll_by_matr.insert(studi)
 
     def _del_search(self, key, cast_to=no_cast):  # deletes all occurences!!!!!!!!!!?
         # print("Achtung: alle gefundenen Studis werden gelöscht!")
         what = self._input(">>> ", cast_to)
-
         self.unsorted_array = [studi for studi in self.unsorted_array if not what == key(studi)]
         self.ll_by_matr.delete(what, key=key)
         self.ll_by_name.delete(what, key=key)
@@ -95,8 +95,8 @@ class TUI:
             "E":  ("Programmende", exit)
         }
         self.unsorted_array = []
-        self.ll_by_name = LinkedList()
-        self.ll_by_matr = LinkedList()
+        self.ll_by_name = LinkedList(key=_sort_name)
+        self.ll_by_matr = LinkedList(key=_sort_matr)
 
         self._load()
 
@@ -105,12 +105,9 @@ class TUI:
         for key, menu_item in self.options.items():
             print(" # {} - {}".format(key, menu_item[0]))
         inp = self._input("Wähle weise: \n>>> ").upper()
-        sel = self.options.get(inp, ("ungültige Eingabe", self._invalid_input))
+        sel = self.options.get(inp, ("ungültige Eingabe", _invalid_input))
         print("'{}' ausgewählt:".format(sel[0]))
         sel[1]()
-
-    def _invalid_input(self):
-        print("ungültige Eingabe")
 
     @staticmethod
     def _print(what):
