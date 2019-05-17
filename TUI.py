@@ -138,8 +138,8 @@ class TUI:
 
     def _del_all(self):
         self.unsorted_array = []
-        self.ll_by_name = LinkedList()
-        self.ll_by_matr = LinkedList()
+        self.ll_by_name = LinkedList(key=_sort_name)
+        self.ll_by_matr = LinkedList(key=_sort_matr)
 
 
 if __name__ == "__main__":
