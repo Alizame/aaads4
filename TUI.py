@@ -21,7 +21,7 @@ class TUI:
 
     def _search(self, lst, key, cast_to=no_cast):
         what = self._input(">>> ", cast_to)
-        return lst.search(what, what=key)
+        return lst.search(what, key=key)
 
     def _add_new_studi(self):
         name = self._input("name: ")

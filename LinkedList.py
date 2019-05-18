@@ -57,12 +57,12 @@ class LinkedList:
         new_node.set_next(next_node.get_next())  # print("found next_node is %s" % next_node)
         next_node.set_next(new_node)
 
-    def search(self, my_key_data, key=None):
+    def search(self, what, key=None):
         if key is None:
             key = self.key
         ret = []
         for node in self:
-            if my_key_data == key(node.get_data()):
+            if what == key(node.get_data()):
                 ret.append(node)
         return ret
 
