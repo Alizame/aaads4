@@ -33,36 +33,6 @@ class TUI:
         self.ll_by_name.insert(studi)
         self.ll_by_matr.insert(studi)
 
-    def _del_search(self, key, cast_to=no_cast):  # deletes all occurences!!!!!!!!!!?
-        # print("Achtung: alle gefundenen Studis werden gelöscht!")
-        what = self._input(">>> ", cast_to)
-        self.unsorted_array = [studi for studi in self.unsorted_array if not what == key(studi)]
-        self.ll_by_matr.delete(what, key=key)
-        self.ll_by_name.delete(what, key=key)
-
-    def __del_node(self, node):
-        self.unsorted_array.remove(node.get_data())
-        self.ll_by_name.delete_node(node)
-        self.ll_by_matr.delete_node(node)
-
-    def _modify_name(self):
-        print("Wähle Nummer:")
-        self._print(self.ll_by_name)
-        studi_node = list(self.ll_by_name)[self._input(">>> ", int)-1]
-        new_name = self._input("Ändere {}: neuer Name: \n>>> ".format(studi_node))
-        self.__del_node(studi_node)  # delete from lists
-        studi_node.get_data().set_name(new_name)  # change student
-        self._add(studi_node.get_data())  # reinsert student (to maintain sorted lists)
-
-    def _modify_matr(self):
-        print("Wähle Nummer:")
-        self._print(self.ll_by_matr)
-        studi_node = list(self.ll_by_matr)[self._input(">>> ", int)-1]
-        new_age = self._input("Ändere {}: neue matr: \n>>> ".format(studi_node), int)
-        self.__del_node(studi_node)  # delete from lists
-        studi_node.get_data().set_matr(new_age)  # change student
-        self._add(studi_node.get_data())  # reinsert student (to maintain sorted lists)
-
     def __init__(self, filepath=None):
         if filepath is None:
             filepath = "studidaten.txt"
