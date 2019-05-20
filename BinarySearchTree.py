@@ -75,5 +75,5 @@ if __name__ == "__main__":
 
 
     print("Search for 80:")
-    print(bst.search(80).key)
+    print(bst.search(80))
 
