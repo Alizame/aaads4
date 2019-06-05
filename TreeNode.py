@@ -7,4 +7,7 @@ class TreeNode:
         self.right: TreeNode = None
 
     def __repr__(self):
-        return str(self.key)
+        return "/" + str(self.key) + "\\"
+
+    def get_data(self):
+        return self.key
