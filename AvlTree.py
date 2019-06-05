@@ -23,6 +23,14 @@ class AvlTree:
         """
         return self._inorder_node(self.root)
 
+    def preorder_node(self):
+        """
+        iterator that goes through preorder and returns node-objects
+        :return: iterator
+        """
+        return self._preorder_node(self.root)
+
+
     def _inorder(self, root: AvlNode):
         if root:
             yield from self._inorder(root.left)
@@ -33,6 +41,12 @@ class AvlTree:
         if root:
             yield from self._inorder_node(root.left)
             yield root
+            yield from self._inorder_node(root.right)
+
+    def _preorder_node(self, root: AvlNode):
+        if root:
+            yield root
+            yield from self._inorder_node(root.left)
             yield from self._inorder_node(root.right)
 
     def search(self, my_key_data, key=None):
@@ -55,7 +69,7 @@ class AvlTree:
                     current = current.right
         else:  # we need to use a different key-func, so our nicely sorted BST is irrelevant and we need to find it by iterating over everything ;(
             for current in self._inorder_node(self.root):
-                if my_key_data == key(current.key):
+                if my_key_data == key(current.val):
                     ret.append(current)
         return ret  # returns [] if nothing found
 
@@ -159,7 +173,7 @@ class AvlTree:
 
         return self.find_inorder_successor(root.left)
 
-    def delete(self, del_node: AvlNode):
+    def delete_node(self, del_node: AvlNode):
         """
         deletes a node from the Tree
         :param del_node: node that should be deleted
@@ -167,14 +181,19 @@ class AvlTree:
         """
         self.root = self._delete(self.root, del_node)
 
+    def delete(self, what, key=None):  # deletes all found, returns list of deleted nodes
+        ret = self.search(what, key)
+        for node in ret:
+            self.delete_node(node)
+        #return ret
+
     def _delete(self, root: AvlNode, del_node: AvlNode):  # returns new root!
-        key = self.key(del_node.val)
         # Step 1: Perform standard BST delete
         if not root:
             return root
-        elif key <= self.key(root.val) and root is not del_node:
+        elif self.key(del_node.val) <= self.key(root.val) and root is not del_node:
             root.left = self._delete(root.left, del_node)
-        elif key > self.key(root.val):
+        elif self.key(del_node.val) > self.key(root.val):
             root.right = self._delete(root.right, del_node)
         else:
             if root.left is None:
@@ -198,6 +217,10 @@ class AvlTree:
 
         return self._rebalance(root)  # Step 3 & 4, get balance-factor and rebalance if necessary
 
+    def change_value(self, modified_node):
+        val = modified_node.key
+        self.delete_node(modified_node)
+        self.insert(val)
 
 if __name__ == "__main__":
     # Test for AvlTree
@@ -235,7 +258,7 @@ if __name__ == "__main__":
     #          / \
     #        20   40
     s = myTree.search(20)[1]
-    myTree.delete(s)  # delete second found node with value 20 (the leaf one)
+    myTree.delete_node(s)  # delete second found node with value 20 (the leaf one)
     assert myTree.root.val == 30
     assert myTree.root.right.val == 40
     assert myTree.root.right.right.val == 50
@@ -243,13 +266,13 @@ if __name__ == "__main__":
     assert myTree.root.left.left.val == 10
     assert myTree.root.left.left.right is None  # <= deleted node
     assert myTree.root.left.right.val == 25
-    myTree.delete(myTree.search(30)[0])
-    myTree.delete(myTree.search(10)[0])
+    myTree.delete_node(myTree.search(30)[0])
+    myTree.delete_node(myTree.search(10)[0])
     assert myTree.root.val == 40
     assert myTree.root.left.val == 20
     assert myTree.root.left.right.val == 25
     assert myTree.root.right.val == 50
-    myTree.delete(myTree.search(50)[0])
+    myTree.delete_node(myTree.search(50)[0])
     assert myTree.root.val == 25
     assert myTree.root.left.val == 20
     assert myTree.root.right.val == 40
